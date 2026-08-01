@@ -64,11 +64,11 @@ export function createScene({ autoplayAudio = true } = {}) {
   orbitLabelsGroup.position.set(0, 0.2, 0);
   scene.add(orbitLabelsGroup);
 
-  const orbitLabels = messages.slice(0, 6).map((message, index) => {
+  const orbitLabels = messages.map((message, index) => {
     const sprite = createOrbitLabelSprite(message);
     orbitLabelsGroup.add(sprite);
 
-    const angle = (index / 6) * Math.PI * 2;
+    const angle = (index / messages.length) * Math.PI * 2;
     sprite.position.set(Math.cos(angle) * 8.6, Math.sin(index * 0.7) * 0.6, Math.sin(angle) * 8.6);
     return sprite;
   });
@@ -277,9 +277,10 @@ export function createScene({ autoplayAudio = true } = {}) {
 
     if (target.userData?.type === "memory") {
       const index = target.userData.index;
+      const memoryContent = reminderCopy.memories[index - 1] || reminderCopy.memories[0];
       ui.showMemory({
-        title: reminderCopy.memoryTitle,
-        text: reminderCopy.memoryText,
+        title: memoryContent.title,
+        text: memoryContent.text,
         image: memories.images[index - 1],
       });
       gsap.to(target.scale, { x: 1.08, y: 1.08, z: 1.08, duration: 0.4, yoyo: true, repeat: 1 });
@@ -415,7 +416,7 @@ export function createScene({ autoplayAudio = true } = {}) {
   }
 
   intro.classList.add("hidden");
-  ui.setTimer(new Date("2022-06-14T00:00:00"));
+  ui.setTimer(new Date("2026-06-14T00:00:00"));
 
   const introTimeline = gsap.timeline({ defaults: { ease: "power2.out" } });
   introTimeline.fromTo(
@@ -453,7 +454,7 @@ export function createScene({ autoplayAudio = true } = {}) {
     window.removeEventListener("touchstart", startAudio);
 
     window.setTimeout(() => {
-      audio.currentTime = 20;
+      audio.currentTime = 40;
       audio.play().catch(() => {});
     }, 1800);
   };
