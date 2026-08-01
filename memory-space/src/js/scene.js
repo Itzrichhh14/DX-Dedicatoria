@@ -7,7 +7,7 @@ import { createParticleField } from "./particles";
 import { createPhotoMemories } from "./photos";
 import { createOrbitalCamera } from "./camera";
 import { createUI } from "./ui";
-import { messages } from "./messages";
+import { messages, reminderCopy } from "./messages";
 
 export function createScene({ autoplayAudio = true } = {}) {
   const root = document.getElementById("app");
@@ -59,6 +59,19 @@ export function createScene({ autoplayAudio = true } = {}) {
   const interactables = [heart, ...memories.interactables];
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
+
+  const orbitLabelsGroup = new THREE.Group();
+  orbitLabelsGroup.position.set(0, 0.2, 0);
+  scene.add(orbitLabelsGroup);
+
+  const orbitLabels = messages.slice(0, 6).map((message, index) => {
+    const sprite = createOrbitLabelSprite(message);
+    orbitLabelsGroup.add(sprite);
+
+    const angle = (index / 6) * Math.PI * 2;
+    sprite.position.set(Math.cos(angle) * 8.6, Math.sin(index * 0.7) * 0.6, Math.sin(angle) * 8.6);
+    return sprite;
+  });
 
   const audio = new Audio(new URL("../assets/music/DannyLux - Mi Otra Mitad [Official Video].mp3", import.meta.url).href);
   audio.loop = true;
@@ -172,6 +185,67 @@ export function createScene({ autoplayAudio = true } = {}) {
     return texture;
   }
 
+  function createOrbitLabelSprite(text) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const paddingX = 20;
+    const paddingY = 10;
+    const fontSize = 17;
+
+    ctx.font = `600 ${fontSize}px Inter, Segoe UI, sans-serif`;
+    const textWidth = ctx.measureText(text).width;
+
+    const logicalWidth = Math.ceil(textWidth + paddingX * 2);
+    const logicalHeight = Math.ceil(fontSize + paddingY * 2);
+    canvas.width = Math.ceil(logicalWidth * dpr);
+    canvas.height = Math.ceil(logicalHeight * dpr);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font = `600 ${fontSize}px Inter, Segoe UI, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const radius = 12;
+    ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+    ctx.fillStyle = "rgba(8, 10, 24, 0.86)";
+    ctx.beginPath();
+    ctx.moveTo(radius, 0);
+    ctx.lineTo(logicalWidth - radius, 0);
+    ctx.quadraticCurveTo(logicalWidth, 0, logicalWidth, radius);
+    ctx.lineTo(logicalWidth, logicalHeight - radius);
+    ctx.quadraticCurveTo(logicalWidth, logicalHeight, logicalWidth - radius, logicalHeight);
+    ctx.lineTo(radius, logicalHeight);
+    ctx.quadraticCurveTo(0, logicalHeight, 0, logicalHeight - radius);
+    ctx.lineTo(0, radius);
+    ctx.quadraticCurveTo(0, 0, radius, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.16)";
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(255,255,255,0.96)";
+    ctx.fillText(text, logicalWidth / 2, logicalHeight / 2);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+
+    const material = new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthTest: true,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+
+    const sprite = new THREE.Sprite(material);
+    sprite.scale.set(logicalWidth / 120, logicalHeight / 120, 1);
+    return sprite;
+  }
+
   function findInteractableTarget(object) {
     let current = object;
     while (current) {
@@ -204,16 +278,16 @@ export function createScene({ autoplayAudio = true } = {}) {
     if (target.userData?.type === "memory") {
       const index = target.userData.index;
       ui.showMemory({
-        title: `Recuerdo ${index}`,
-        text: `Este espacio te guarda con ternura, como un recuerdo que aún brilla entre las estrellas.`,
+        title: reminderCopy.memoryTitle,
+        text: reminderCopy.memoryText,
         image: memories.images[index - 1],
       });
       gsap.to(target.scale, { x: 1.08, y: 1.08, z: 1.08, duration: 0.4, yoyo: true, repeat: 1 });
       gsap.to(target.rotation, { z: target.rotation.z + 0.3, duration: 0.6 });
     } else if (target.userData?.type === "heart" || target === heart) {
       ui.showMemory({
-        title: "Corazón cósmico",
-        text: `Tu luz sigue latiendo aquí: ${messages[Math.floor(Math.random() * messages.length)]}`,
+        title: reminderCopy.heartTitle,
+        text: `${reminderCopy.heartText} ${messages[Math.floor(Math.random() * messages.length)]}`,
         image: null,
       });
       gsap.to(heart.scale, { x: 1.14, y: 1.14, z: 1.14, duration: 0.35, yoyo: true, repeat: 1 });
@@ -375,10 +449,13 @@ export function createScene({ autoplayAudio = true } = {}) {
   );
 
   const startAudio = () => {
-    audio.currentTime = 0;
-    audio.play().catch(() => {});
     window.removeEventListener("pointerdown", startAudio);
     window.removeEventListener("touchstart", startAudio);
+
+    window.setTimeout(() => {
+      audio.currentTime = 20;
+      audio.play().catch(() => {});
+    }, 1800);
   };
 
   if (autoplayAudio) {

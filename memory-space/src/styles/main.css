@@ -195,25 +195,20 @@ canvas {
   align-self: flex-end;
 }
 
-.floating-messages {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.floating-phrase {
-  position: absolute;
-  color: rgba(255,255,255,0.86);
-  font-size: 0.75rem;
-  letter-spacing: 0.16em;
+.orbit-label {
+  display: inline-block;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(8, 10, 24, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-weight: 600;
-  text-shadow: 0 0 16px rgba(255,255,255,0.25);
-  opacity: 0.86;
-  will-change: left, top, transform;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
 }
-
 .memory-modal {
   position: fixed;
   inset: 0;

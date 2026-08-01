@@ -11,49 +11,6 @@ export function createUI() {
   timer.className = "timer-pill";
   overlay.appendChild(timer);
 
-  const floatingMessages = document.createElement("div");
-  floatingMessages.className = "floating-messages";
-  overlay.appendChild(floatingMessages);
-
-  const phrases = ["mi amor", "mi cielo", "mi universo", "mi hogar", "mi eternidad"];
-  const orbitStarts = [0.15, 0.4, 0.62, 0.84, 0.98];
-  const phraseElements = [];
-
-  phrases.forEach((phrase, index) => {
-    const item = document.createElement("span");
-    item.className = "floating-phrase";
-    item.textContent = phrase;
-    const angle = Math.PI * 2 * orbitStarts[index];
-    item.dataset.angle = String(angle);
-    item.dataset.radiusX = String(34 + index * 4);
-    item.dataset.radiusY = String(24 + (index % 2) * 8);
-    item.dataset.speed = String(0.22 + index * 0.025);
-    item.dataset.phase = String(index * 0.8);
-    floatingMessages.appendChild(item);
-    phraseElements.push(item);
-  });
-
-  function updateFloatingPhrases(time) {
-    const seconds = time / 1000;
-    phraseElements.forEach((element) => {
-      const radiusX = Number(element.dataset.radiusX);
-      const radiusY = Number(element.dataset.radiusY);
-      const speed = Number(element.dataset.speed);
-      const phase = Number(element.dataset.phase);
-      const angle = seconds * speed + phase;
-      const wobble = Math.sin(seconds * 0.7 + phase) * 6;
-      const x = 50 + Math.cos(angle) * radiusX + wobble * 0.25;
-      const y = 50 + Math.sin(angle) * radiusY + Math.sin(seconds * 0.6 + phase * 0.9) * 4;
-      const tilt = Math.sin(seconds * 0.8 + phase) * 4;
-      element.style.left = `${x}%`;
-      element.style.top = `${y}%`;
-      element.style.transform = `translate(-50%, -50%) rotate(${tilt}deg)`;
-    });
-    requestAnimationFrame(updateFloatingPhrases);
-  }
-
-  requestAnimationFrame(updateFloatingPhrases);
-
   const modal = document.createElement("div");
   modal.className = "memory-modal";
   modal.innerHTML = `<div class="memory-card"><div class="memory-photo"></div><div class="memory-copy"><h2></h2><p></p></div></div>`;
