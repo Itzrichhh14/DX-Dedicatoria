@@ -4,5 +4,7 @@ export const messages = [
     "Te volvería a elegir mil veces.",
     "Contigo todo tiene sentido.",
     "Siempre tú.",
-    "Te amo muchísimo."
+    "Te amo muchísimo.",
+    "Cada recuerdo contigo es un universo.",
+    "Tu luz vive en cada estrella que veo."
 ];
