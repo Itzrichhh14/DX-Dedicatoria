@@ -6,7 +6,8 @@ export function createPhotoMemories() {
   const interactables = [];
 
   for (let index = 1; index <= 16; index += 1) {
-    const texture = new THREE.TextureLoader().load(`/src/assets/photos/${String(index).padStart(2, "0")}.jpg`);
+    const photoUrl = new URL(`../assets/photos/${String(index).padStart(2, "0")}.jpg`, import.meta.url);
+    const texture = new THREE.TextureLoader().load(photoUrl.href);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = 8;
     textures.push(texture);
